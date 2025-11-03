@@ -14,6 +14,7 @@ import {
   RouteRestaurantDashboard,
   RouteUserLogin,
   RouteUserSignUp,
+  RouteViewCart,
   RouteYourMenu,
 } from "./helpers/RouteNames";
 import { UserSignup } from "./pages/UserSignup";
@@ -34,6 +35,7 @@ import Details from "./pages/Details";
 import DishDetails from "./pages/myrestaurant/DishDetails";
 import RestaurantPage from "./pages/RestaurantPage";
 import ItemDetail from "./pages/ItemDetail";
+import CartPage from "./pages/CartPage";
 BrowserRouter;
 function App() {
   return (
@@ -48,6 +50,7 @@ function App() {
           />
           <Route path={RouteRestaurant()} element={<RestaurantPage />} />
           <Route path={RouteItemDetails()} element={<ItemDetail />} />
+          <Route path={RouteViewCart} element={<CartPage />} />
         </Route>
 
         <Route element={<RestaurantDashLayout />}>

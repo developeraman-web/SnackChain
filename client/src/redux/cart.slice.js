@@ -16,6 +16,11 @@ const CartSlice = createSlice({
   reducers: {
     addItemsToCart: (state, action) => {
       const { itemId, quantity } = action.payload;
+
+      if (quantity === 0) {
+        state.items = state.items.filter((item) => !(item.itemId === itemId));
+        return;
+      }
       const existingItem = state.items.findIndex(
         (item) => item.itemId === itemId
       );
@@ -27,6 +32,7 @@ const CartSlice = createSlice({
           ...state.items[existingItem],
           quantity: quantity,
         };
+
         return;
       }
 

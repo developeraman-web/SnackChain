@@ -23,10 +23,11 @@ export const RouteItemDetails = (restaurantid, id) => {
     return `/${restaurantid}/item/${id}`;
   }
 };
-export const RouteRestaurant = (id) => {
-  if (!id) {
-    return "/restaurant/:id";
+export const RouteRestaurant = (restaurantid) => {
+  if (!restaurantid) {
+    return "/restaurant/:restaurantid";
   } else {
-    return `/restaurant/${id}`;
+    return `/restaurant/${restaurantid}`;
   }
 };
+export const RouteViewCart = "/my-cart";

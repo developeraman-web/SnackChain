@@ -9,22 +9,35 @@ import { FiMinus } from "react-icons/fi";
 import { FaPlus } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { addItemsToCart, deleteRestId, setRestId } from "@/redux/cart.slice";
-function DishCard({ item, id }) {
+import { MdHighQuality } from "react-icons/md";
+import { showToast } from "@/helpers/showToast";
+function DishCard({ item, restaurantid }) {
   const [cartOpen, setCartOpen] = useState(false);
   const dispatch = useDispatch();
-  let quantity = null;
-  const [count, setCount] = useState(quantity ? quantity : 0);
+  let quantity;
+  const [count, setCount] = useState(quantity);
   const cart = useSelector((state) => state.cart);
   const handleClick = (e, id) => {
-    setCartOpen(true);
+    if (cart && cart.restId !== restaurantid) {
+      showToast("error", "Cannot order from different restaruants at once");
+      return;
+    }
     if (count === 0) {
+      setCartOpen(true);
       setCount(1);
     }
   };
   const handleDecrease = (e) => {
     e.stopPropagation();
     if (count === 1) {
+      setCount((prev) => prev - 1);
       setCartOpen(false);
+      dispatch(
+        addItemsToCart({
+          itemId: item._id,
+          quantity: 0,
+        })
+      );
     } else {
       setCount((prev) => prev - 1);
     }
@@ -39,21 +52,23 @@ function DishCard({ item, id }) {
     if (count >= 1) {
       myCart = {
         itemId: item._id,
-        quantity: quantity,
+        quantity: count,
       };
       dispatch(addItemsToCart(myCart));
     }
-  }, [count, cartOpen]);
+  }, [count]);
   useEffect(() => {
     const getQuantity = (item) => {
-      const index = cart.items.findIndex((i) => i.itemId === item._id);
-      if (index !== -1) {
-        return cart.items[index].quantity;
+      const index = cart.items.find((i) => i.itemId === item._id);
+      if (index) {
+        return index.quantity;
       } else {
         return 0;
       }
     };
-    getQuantity(item);
+    quantity = getQuantity(item);
+    quantity > 0 ? setCartOpen(true) : setCartOpen(false);
+    quantity > 0 ? setCount(quantity) : setCount(0);
   }, []);
   return (
     <div
@@ -76,7 +91,9 @@ function DishCard({ item, id }) {
       </div>
       <div className="flex justify-between items-center my-3">
         <button className="py-2 px-4 rounded-lg text-center shadow-lg text-lg font-bold text-gray-600  bg-white">
-          <Link to={RouteItemDetails(id, item._id)}>View Details</Link>
+          <Link to={RouteItemDetails(restaurantid, item._id)}>
+            View Details
+          </Link>
         </button>
         <div
           onClick={(e) => handleClick(e, item._id)}
@@ -108,13 +125,16 @@ function DishCard({ item, id }) {
 }
 
 export default function RestaurantPage() {
-  const { id } = useParams();
+  const { restaurantid } = useParams();
   const user = useSelector((state) => state.user);
+  const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const userId = user?.user?._id;
 
   const { data: menuData, loading } = useFetch(
-    `${getEnv("VITE_API_BASE_URL")}/menu/get-restaurant-menu/${id ? id : ""}`,
+    `${getEnv("VITE_API_BASE_URL")}/menu/get-restaurant-menu/${
+      restaurantid ? restaurantid : ""
+    }`,
     {
       method: "get",
       credentials: "include",
@@ -122,20 +142,27 @@ export default function RestaurantPage() {
     []
   );
   useEffect(() => {
-    dispatch(setRestId(id));
-    return () => dispatch(deleteRestId());
+    if (cart && cart.items.length === 0) {
+      dispatch(setRestId(restaurantid));
+    }
   }, []);
   return (
     <div className="pt-10 pb-10">
       <h1 className="font-bold md:text-2xl text-lg ">
-        Place Your Order at {menuData?.menu[0]?.restaurant?.name || "Now"}
+        Place Your Order
+        {menuData ? ` at ${menuData?.menu[0]?.restaurant?.name}` : "Now"}
       </h1>
       <div className="grid md:grid-cols-3 grid-cols-1 gap-3 mt-2 border-t pt-5">
         {menuData && menuData?.menu?.length > 0 ? (
           <>
             {menuData?.menu.map((item) => {
               return (
-                <DishCard key={item._id} item={item} userId={userId} id={id} />
+                <DishCard
+                  key={item._id}
+                  item={item}
+                  userId={userId}
+                  restaurantid={restaurantid}
+                />
               );
             })}
           </>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "@/assets/images/logo.png";
 import { FaAngleDown } from "react-icons/fa";
 import { CiDiscount1 } from "react-icons/ci";
@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { RxCross2 } from "react-icons/rx";
 import { Button } from "../ui/button";
 import { Link } from "react-router";
 import {
@@ -18,6 +19,7 @@ import {
   RouteCampusDetails,
   RouteIndex,
   RouteUserLogin,
+  RouteViewCart,
 } from "@/helpers/RouteNames";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUser, setUser, updateLocation } from "@/redux/user.slice";
@@ -26,6 +28,8 @@ import { getEnv } from "@/helpers/getEnv";
 import { FiExternalLink } from "react-icons/fi";
 export default function Topbar() {
   const user = useSelector((state) => state.user);
+  const cart = useSelector((state) => state.cart);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const dispatch = useDispatch();
   const handleLogout = async () => {
     try {
@@ -48,8 +52,30 @@ export default function Topbar() {
       showToast("error", error.message);
     }
   };
+  const handleClick = () => {
+    setIsCartOpen((prev) => !prev);
+  };
   return (
     <header className="fixed z-50 bg-white left-0 right-0 py-2.5 border-b">
+      <div
+        className={`fixed bg-black/35 top-0 bottom-0 left-0 right-0 w-full duration-300 ease-in z-20 ${
+          isCartOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      ></div>
+      <div className="fixed top-0 bottom-0 right-0 w-xl h-screen bg-white z-20 p-2">
+        <div className="flex justify-between ">
+          <div>
+            <Link to={RouteIndex}>
+              <img height={150} width={150} src={logo} alt="" />
+            </Link>
+          </div>
+          <div>
+            <RxCross2 />
+          </div>
+        </div>
+        <div></div>
+        <div></div>
+      </div>
       <div className="flex justify-between items-center container">
         <div className="flex gap-2 items-center">
           <Link to={RouteIndex}>
@@ -73,8 +99,17 @@ export default function Topbar() {
             </DropdownMenu>
           </div>
           <div className="p-1 px-3 border-l flex gap-1 items-center">
-            <CiShoppingCart />
-            cart
+            <Link onClick={handleClick} className="flex items-center  gap-0.5">
+              <div className="relative">
+                {cart && cart.items.length > 0 && (
+                  <div className="absolute -top-1 rounded-[100%] p-2.5 left-0 w-4 flex items-center justify-center h-4 bg-red-700 text-white">
+                    {cart ? cart.items.length : 0}
+                  </div>
+                )}
+                <CiShoppingCart size={30} />
+              </div>
+              View cart
+            </Link>
           </div>
           {user && user.user.role === "admin" ? (
             <>
