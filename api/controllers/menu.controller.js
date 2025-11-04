@@ -76,6 +76,34 @@ export const getAllMenu = async (req, res, next) => {
     next(handleError(500, error.message));
   }
 };
+export const getCartMenu = async (req, res, next) => {
+  try {
+    const { items } = req.body;
+    const idArray = items.map((item) => item.itemId);
+    const menu = await Menu.find({ _id: { $in: idArray } })
+      .lean()
+      .exec();
+    if (!menu) {
+      return next(handleError(404, "No Menu Item"));
+    }
+    let total = 0;
+    for (const item of items) {
+      const dbItem = menu.find((i) => i._id.toString() === item.itemId);
+      if (dbItem) {
+        total += dbItem.price * item.quantity;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Menu items found successfully!",
+      menu,
+      total,
+    });
+  } catch (error) {
+    next(handleError(500, error.message));
+  }
+};
 
 export const editMenu = async (req, res, next) => {
   try {

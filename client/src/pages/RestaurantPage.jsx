@@ -69,7 +69,7 @@ function DishCard({ item, restaurantid }) {
     quantity = getQuantity(item);
     quantity > 0 ? setCartOpen(true) : setCartOpen(false);
     quantity > 0 ? setCount(quantity) : setCount(0);
-  }, []);
+  }, [cart]);
   return (
     <div
       className="flex flex-col gap-2 p-2 min-h-48  hover:-translate-y-1.5 duration-300 shadow-md rounded-2xl bg-amber-950/10 "

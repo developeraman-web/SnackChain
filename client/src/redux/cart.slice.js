@@ -25,14 +25,16 @@ const CartSlice = createSlice({
         (item) => item.itemId === itemId
       );
       if (existingItem === -1) {
-        state.items.push(action.payload);
+        const updatedItem = [...state.items, action.payload];
+        state.items = updatedItem;
         return;
       } else {
-        state.items[existingItem] = {
-          ...state.items[existingItem],
+        const updatedItem = [...state.items];
+        updatedItem[existingItem] = {
+          ...updatedItem[existingItem],
           quantity: quantity,
         };
-
+        state.items = updatedItem;
         return;
       }
 
@@ -60,9 +62,12 @@ const CartSlice = createSlice({
     deleteRestId: (state, action) => {
       state.restId = null;
     },
+    emptyCart: (state) => {
+      state.items = [];
+    },
   },
 });
 
-export const { addItemsToCart, setRestId, setUserId, deleteRestId } =
+export const { addItemsToCart, setRestId, setUserId, deleteRestId, emptyCart } =
   CartSlice.actions;
 export default CartSlice.reducer;

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RxCross2 } from "react-icons/rx";
 import { Button } from "../ui/button";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   RouteBusinessIndex,
   RouteCampusDetails,
@@ -26,10 +26,14 @@ import { removeUser, setUser, updateLocation } from "@/redux/user.slice";
 import { showToast } from "@/helpers/showToast";
 import { getEnv } from "@/helpers/getEnv";
 import { FiExternalLink } from "react-icons/fi";
+import Cart from "../Cart";
+import { deleteRestId, emptyCart } from "@/redux/cart.slice";
 export default function Topbar() {
   const user = useSelector((state) => state.user);
   const cart = useSelector((state) => state.cart);
+  const navigate = useNavigate();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [orderMenu, setOrderMenu] = useState([]);
   const dispatch = useDispatch();
   const handleLogout = async () => {
     try {
@@ -55,6 +59,34 @@ export default function Topbar() {
   const handleClick = () => {
     setIsCartOpen((prev) => !prev);
   };
+  const handlePlaceOrder = async () => {
+    try {
+      const orderDetails = { ...cart, orderMenu: orderMenu };
+      const res = await fetch(
+        `${getEnv("VITE_API_BASE_URL")}/order/place-order`,
+        {
+          method: "post",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(orderDetails),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        return showToast("error", data.message);
+      }
+      showToast("success", data.message);
+      dispatch(emptyCart());
+      dispatch(deleteRestId());
+      setIsCartOpen(false);
+      navigate(RouteIndex);
+    } catch (error) {
+      showToast("error", error.message);
+    }
+  };
+  const getMenu = (menu = []) => {
+    setOrderMenu(menu);
+  };
+
   return (
     <header className="fixed z-50 bg-white left-0 right-0 py-2.5 border-b">
       <div
@@ -62,19 +94,38 @@ export default function Topbar() {
           isCartOpen ? "translate-x-0" : "translate-x-full"
         }`}
       ></div>
-      <div className="fixed top-0 bottom-0 right-0 w-xl h-screen bg-white z-20 p-2">
-        <div className="flex justify-between ">
+      <div
+        className={`fixed top-0 bottom-0 right-0 w-xl min-h-screen bg-white z-20 p-2 duration-500 delay-75 ${
+          isCartOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex justify-between p-3 ">
           <div>
             <Link to={RouteIndex}>
               <img height={150} width={150} src={logo} alt="" />
             </Link>
           </div>
-          <div>
+          <div className="cursor-pointer" onClick={handleClick}>
             <RxCross2 />
           </div>
         </div>
-        <div></div>
-        <div></div>
+        {cart && cart?.items.length > 0 ? (
+          <>
+            <div>
+              {isCartOpen && <Cart items={cart?.items} getMenu={getMenu} />}
+            </div>
+            <div className="absolute bottom-0 w-full p-3">
+              <Button
+                onClick={handlePlaceOrder}
+                className={"w-full cursor-pointer"}
+              >
+                Place order
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>No items in cart</>
+        )}
       </div>
       <div className="flex justify-between items-center container">
         <div className="flex gap-2 items-center">
