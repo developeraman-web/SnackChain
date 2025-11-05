@@ -8,6 +8,7 @@ import {
   RouteCampusDetails,
   RouteDishDetails,
   RouteItemDetails,
+  RouteOrders,
   RouteOwnerCredentials,
   RouteRegisterRestraunt,
   RouteRestaurant,
@@ -35,7 +36,8 @@ import Details from "./pages/Details";
 import DishDetails from "./pages/myrestaurant/DishDetails";
 import RestaurantPage from "./pages/RestaurantPage";
 import ItemDetail from "./pages/ItemDetail";
-BrowserRouter;
+import Orders from "./pages/Orders";
+
 function App() {
   return (
     <BrowserRouter>
@@ -49,6 +51,7 @@ function App() {
           />
           <Route path={RouteRestaurant()} element={<RestaurantPage />} />
           <Route path={RouteItemDetails()} element={<ItemDetail />} />
+          <Route path={RouteOrders} element={<Orders />} />
         </Route>
 
         <Route element={<RestaurantDashLayout />}>

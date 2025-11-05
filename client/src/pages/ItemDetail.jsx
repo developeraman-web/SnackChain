@@ -8,15 +8,24 @@ import { FiMinus } from "react-icons/fi";
 import { FaPlus } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { addItemsToCart, deleteRestId, setRestId } from "@/redux/cart.slice";
+import { showToast } from "@/helpers/showToast";
 
 export default function ItemDetail() {
   const { restaurantid: restaurantId, id } = useParams();
   const [cartOpen, setCartOpen] = useState(false);
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   let quantity;
   const [count, setCount] = useState(quantity);
   const cart = useSelector((state) => state.cart);
   const handleClick = (e, id) => {
+    if (user && !user.isLoggedIn) {
+      return showToast("error", "Please Login");
+    }
+    if (cart && cart.restId !== restaurantId) {
+      showToast("error", "Cannot order from different restaruants at once");
+      return;
+    }
     if (count === 0) {
       setCartOpen(true);
       setCount(1);
@@ -102,7 +111,6 @@ export default function ItemDetail() {
             <p className="text-gray-700">{itemData?.menu?.description}</p>
             <div className="flex justify-end mt-3">
               <div
-                onClick={(e) => handleClick(e, id)}
                 className={`py-2 px-4 rounded-lg text-center shadow-lg text-lg w-28 font-bold ${
                   cartOpen
                     ? "border-amber-900 border-2"
@@ -129,7 +137,12 @@ export default function ItemDetail() {
                   </>
                 ) : (
                   <>
-                    <div className="cursor-pointer">Add Cart</div>
+                    <button
+                      onClick={(e) => handleClick(e, id)}
+                      className="cursor-pointer"
+                    >
+                      Add Cart
+                    </button>
                   </>
                 )}
               </div>

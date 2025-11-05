@@ -10,7 +10,7 @@ export default function Layout() {
       <Topbar />
       <div className="container">
         <main className="w-full">
-          <div className="px-13 pt-12 w-full  min-h-screen">
+          <div className="md:px-13 px-3 pt-12 w-full  min-h-screen">
             <Outlet />
           </div>
         </main>

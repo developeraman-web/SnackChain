@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { handleError } from "../helpers/handleError.js";
 import Order from "../models/order.model.js";
 import OrderItem from "../models/orderItem.model.js";
@@ -42,8 +43,78 @@ export const generateOrderItems = async (req, res) => {
       await dbOrderItem.save();
     });
 
-    res.json({ message: "order Placed successfully" });
+    res.json({ message: "Order Placed successfully" });
   } catch (error) {
     return next(handleError());
+  }
+};
+
+export const showMyOrder = async (req, res, next) => {
+  try {
+    const { userid } = req.params;
+    const orders = await Order.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(userid) } },
+      {
+        $lookup: {
+          from: "orderItem",
+          localField: "_id",
+          foreignField: "orderId",
+          as: "orderItems",
+          pipeline: [
+            {
+              $lookup: {
+                from: "menu",
+                localField: "menuId",
+                foreignField: "_id",
+                as: "menu",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: 1,
+                      name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $unwind: {
+                path: "$menu",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+          ],
+        },
+      },
+
+      {
+        $lookup: {
+          from: "restaurant",
+          localField: "restaurantId",
+          foreignField: "_id",
+          as: "restaurant",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                name: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: {
+          path: "$restaurant",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ]).exec();
+    res.status(200).json({
+      message: "orders fetched successfuly",
+      orders,
+    });
+  } catch (error) {
+    return next(handleError(500, error.message));
   }
 };

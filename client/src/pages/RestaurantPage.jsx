@@ -17,7 +17,11 @@ function DishCard({ item, restaurantid }) {
   let quantity;
   const [count, setCount] = useState(quantity);
   const cart = useSelector((state) => state.cart);
+  const user = useSelector((state) => state.user);
   const handleClick = (e, id) => {
+    if (user && !user.isLoggedIn) {
+      return showToast("error", "Please Login");
+    }
     if (cart && cart.restId !== restaurantid) {
       showToast("error", "Cannot order from different restaruants at once");
       return;
@@ -96,7 +100,6 @@ function DishCard({ item, restaurantid }) {
           </Link>
         </button>
         <div
-          onClick={(e) => handleClick(e, item._id)}
           className={`py-2 px-4 rounded-lg text-center shadow-lg text-lg w-28 font-bold ${
             cartOpen ? "border-amber-900 border-2" : "bg-amber-950  text-white"
           }`}
@@ -115,7 +118,12 @@ function DishCard({ item, restaurantid }) {
             </>
           ) : (
             <>
-              <div className="cursor-pointer">Add Cart</div>
+              <button
+                onClick={(e) => handleClick(e, item._id)}
+                className="cursor-pointer"
+              >
+                Add Cart
+              </button>
             </>
           )}
         </div>

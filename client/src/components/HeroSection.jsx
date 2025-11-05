@@ -93,7 +93,7 @@ export default function HeroSection() {
         <Form className={"z-10 relative"} {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className=" relative z-10 w-[450px] flex justify-center items-center gap-2"
+            className=" relative z-10 md:w-[450px] w-[200px] flex md:flex-row flex-col justify-center items-center gap-2"
           >
             <FormField
               control={form.control}
