@@ -19,11 +19,11 @@ import { FaRegTrashCan } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import { Link } from "react-router";
 
-export default function Orders() {
-  const user = useSelector((state) => state.user);
+export default function AllOrders() {
+  const restaurant = useSelector((state) => state.restaurant);
   const { data: orderData, loading } = useFetch(
-    `${getEnv("VITE_API_BASE_URL")}/order/show-my-order/${
-      user ? user.user._id : ""
+    `${getEnv("VITE_API_BASE_URL")}/order/show-all-order/${
+      restaurant ? restaurant.restaurant._id : ""
     }`,
     {
       method: "get",

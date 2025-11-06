@@ -32,3 +32,4 @@ export const RouteRestaurant = (restaurantid) => {
 };
 export const RouteViewCart = "/my-cart";
 export const RouteOrders = "/my-orders";
+export const RouteRestaurantWiseOrder = "/all-orders";

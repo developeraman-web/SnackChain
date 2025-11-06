@@ -6,6 +6,7 @@ import { GoEyeClosed } from "react-icons/go";
 import { TagVegOfNonVeg } from "@/pages/myrestaurant/DishDetails";
 import { Link } from "react-router";
 import { RouteRestaurant } from "@/helpers/RouteNames";
+import { GiForkKnifeSpoon } from "react-icons/gi";
 
 export default function Restraunt() {
   const user = useSelector((state) => state.user);
@@ -57,8 +58,10 @@ export default function Restraunt() {
                       </h2>
                       <div className=" ">
                         {" "}
-                        {restaurant.isOpen === "true" ? (
-                          "Opened"
+                        {restaurant?.isOpen === true ? (
+                          <span className="flex items-center gap-1 text-green-600">
+                            <GiForkKnifeSpoon /> Open
+                          </span>
                         ) : (
                           <>
                             <span className="flex items-center gap-1 text-red-600">

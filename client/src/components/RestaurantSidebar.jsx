@@ -14,7 +14,12 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import { BiFoodMenu } from "react-icons/bi";
 import { AiOutlineHome } from "react-icons/ai";
-import { RouteRestaurantDashboard, RouteYourMenu } from "@/helpers/RouteNames";
+import {
+  RouteRestaurantDashboard,
+  RouteRestaurantWiseOrder,
+  RouteYourMenu,
+} from "@/helpers/RouteNames";
+import { CiDeliveryTruck } from "react-icons/ci";
 export default function RestaurantSidebar() {
   const restaurant = useSelector((state) => state.restaurant);
 
@@ -43,9 +48,10 @@ export default function RestaurantSidebar() {
               </SidebarMenuItem>
               <SidebarMenuItem key={""}>
                 <SidebarMenuButton asChild>
-                  <a href={""}>
-                    <span>{"hello"}</span>
-                  </a>
+                  <Link to={RouteRestaurantWiseOrder}>
+                    <CiDeliveryTruck />
+                    All Orders
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

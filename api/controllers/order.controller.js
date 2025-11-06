@@ -54,6 +54,7 @@ export const showMyOrder = async (req, res, next) => {
     const { userid } = req.params;
     const orders = await Order.aggregate([
       { $match: { userId: new mongoose.Types.ObjectId(userid) } },
+      { $sort: { createdAt: -1 } },
       {
         $lookup: {
           from: "orderItem",
@@ -116,5 +117,79 @@ export const showMyOrder = async (req, res, next) => {
     });
   } catch (error) {
     return next(handleError(500, error.message));
+  }
+};
+
+export const showAllOrders = async (req, res, next) => {
+  try {
+    const { restid } = req.params;
+    const orders = await Order.aggregate([
+      {
+        $match: { restaurantId: new mongoose.Types.ObjectId(restid) },
+      },
+      { $sort: { createdAt: -1 } },
+      {
+        $lookup: {
+          from: "orderItem",
+          localField: "_id",
+          foreignField: "orderId",
+          as: "orderItems",
+          pipeline: [
+            {
+              $lookup: {
+                from: "menu",
+                localField: "menuId",
+                foreignField: "_id",
+                as: "menu",
+                pipeline: [
+                  {
+                    $project: {
+                      _id: 1,
+                      name: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $unwind: {
+                path: "$menu",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+          ],
+        },
+      },
+
+      {
+        $lookup: {
+          from: "restaurant",
+          localField: "restaurantId",
+          foreignField: "_id",
+          as: "restaurant",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                name: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: {
+          path: "$restaurant",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ]);
+    res.status(200).json({
+      success: true,
+      message: "orders found succesfully",
+      orders,
+    });
+  } catch (error) {
+    return next(handleError(500, `catch block error: ${error.message} `));
   }
 };

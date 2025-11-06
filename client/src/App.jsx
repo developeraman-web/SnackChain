@@ -1,4 +1,10 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import {
+  BrowserRouter,
+  createBrowserRouter,
+  Route,
+  RouterProvider,
+  Routes,
+} from "react-router";
 import Index from "./pages/Index";
 import Layout from "./layout/Layout";
 import {
@@ -13,6 +19,7 @@ import {
   RouteRegisterRestraunt,
   RouteRestaurant,
   RouteRestaurantDashboard,
+  RouteRestaurantWiseOrder,
   RouteUserLogin,
   RouteUserSignUp,
   RouteViewCart,
@@ -28,7 +35,6 @@ import BusinessIndex from "./pages/business/BusinessIndex";
 import RegisterRestaurant from "./pages/business/RegisterRestaurant";
 import RestaurantDashLayout from "./layout/RestaurantDashLayout";
 import { OwnerCredentials } from "./pages/OwnerCredentials";
-import RestaurantDashboard from "./pages/business/RestaurantDashboard";
 import Menu from "./pages/myrestaurant/Menu";
 import AddDish from "./pages/myrestaurant/AddDish";
 import Cards from "./pages/Cards";
@@ -37,6 +43,8 @@ import DishDetails from "./pages/myrestaurant/DishDetails";
 import RestaurantPage from "./pages/RestaurantPage";
 import ItemDetail from "./pages/ItemDetail";
 import Orders from "./pages/Orders";
+import RestaurantDashboard from "./pages/myrestaurant/RestaurantDashboard";
+import AllOrders from "./pages/myrestaurant/AllOrders";
 
 function App() {
   return (
@@ -63,6 +71,7 @@ function App() {
           <Route path={RouteYourMenu} element={<Menu />} />
           <Route path={RouteAddDish} element={<AddDish />} />
           <Route path={RouteDishDetails()} element={<DishDetails />} />
+          <Route path={RouteRestaurantWiseOrder} element={<AllOrders />} />
         </Route>
 
         <Route element={<AuthAdminProtected />}>

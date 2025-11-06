@@ -15,7 +15,6 @@ export default function RestaurantDashLayout() {
           <Outlet />
         </div>
       </main>
-      <Footer />
     </SidebarProvider>
   );
 }

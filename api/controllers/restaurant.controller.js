@@ -87,5 +87,61 @@ export const getRestaurantByCampus = async (req, res, next) => {
       restaurants,
       message: "campus wise rest.",
     });
-  } catch (error) {}
+  } catch (error) {
+    return next(handleError(500, error.message));
+  }
+};
+export const updateRestaurant = async (req, res, next) => {
+  try {
+    const data = req.body;
+    let restaurant = await Restaurant.findOne({
+      name: data.restaurantName,
+      campus: data.campus,
+    });
+
+    let featuredImage = "";
+    if (req.body.file) {
+      const uploadResult = await cloudinary.uploader
+        .upload(req.body.file, {
+          folder: "foodApp",
+          resource_type: "auto",
+        })
+        .catch((error) => {
+          return next(handleError(500, `cloudinary error: ${error.message}`));
+        });
+      featuredImage = uploadResult.secure_url;
+    }
+
+    restaurant.name = data.restaurantName;
+    restaurant.campus = data.campus;
+    restaurant.restaurantContact = data.restaurantContact;
+    restaurant.slug = data.slug;
+    restaurant.tag = data.tag;
+    restaurant.restaurantFeatureImage = featuredImage;
+    restaurant.ownerContact = data.ownerContact;
+    restaurant.ownerEmail = data.ownerEmail;
+    restaurant.ownerName = data.ownerName;
+    restaurant.isOpen = data.isOpen;
+    await restaurant.save();
+    res.status(200).json({
+      success: true,
+      message: "Restaurant updated successfully",
+    });
+  } catch (error) {
+    next(handleError(500, `error from catch block: ${error.message}`));
+  }
+};
+export const getRestaurantById = async (req, res, next) => {
+  try {
+    const { restaurantid } = req.params;
+    const restaurant = await Restaurant.findById(restaurantid);
+
+    res.status(200).json({
+      success: true,
+      restaurant,
+      message: "id wise rest.",
+    });
+  } catch (error) {
+    return next(handleError(500, error.message));
+  }
 };
